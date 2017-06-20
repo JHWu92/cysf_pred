@@ -1,50 +1,51 @@
 import pandas as pd
-from constants import fn_features_dc, dir_data, index_seg, features_for_total
+from wKit.ML.feature_selection import has_value_thres
+
+from constants import fn_features_dc, dir_data, features_for_total
+from wKit.ML.dprep import fillna_group_mean
 
 
-def load_joint_features(years=(2014,2015,2016,2017), how='NO_TOTAL', na=None, verbose=False):
+def load_features(lts, drop_na_thres=0.1, how='TOTAL', years=(2014, 2015, 2016, 2017)):
     """
-    for each feature files:
-        1. get dummies, dummy_na=False;
-        2. fillna with na if na is not None, default None;
-        3. encode each feature names with ftr_name_No
-    return joint features and code book
+    filter data with year month by year
+    filter data to either total count only or divided by different types
+    filter data(columns) if has values< thres (whole population is decided by lts)
+    fill na with group means for ['moving', 'parking', 'crash']
     """
-    features = load_separate_features(verbose=verbose, na=na)
+    seg_type = pd.read_csv('data/seg_street_type.csv')
+    fillna_by_group_names = ['moving', 'parking', 'crash']
     joint_features = []
-    ftr_col2code = {}
-    for name, df in features.items():
-        ftr = df.copy()
+    for name, fn in fn_features_dc.items():
+        print 'loading', name, fn
+        ftr = pd.read_csv(dir_data + fn, index_col=0)
         ftr = filter_year(ftr, years=years)
+
         if name in features_for_total:
             ftr = filter_total(ftr, name, how=how)
-        col2code = encode_col(ftr, name)
+
+        # ftr aggregated to one item matches one segment
         ftr = ftr.groupby(level=0).sum()
 
+        # get complete list of segments
+        ftr = lts.merge(ftr, left_index=True, right_index=True, how='left').drop('LTS', axis=1)
+
+        # filter columns with too many NA
+        keep_col = has_value_thres(ftr, thres=drop_na_thres)
+        keep_col = keep_col[keep_col].index.tolist()
+        print 'all columns #:', ftr.shape[1], 'columns pass NA thres:', len(keep_col), '\n'
+        ftr = ftr[keep_col]
+
+        # fillna by means of segment types, if applicable
+        if name in fillna_by_group_names:
+            ftr = fillna_group_mean(ftr, seg_type)
+
         joint_features.append(ftr)
-        ftr_col2code.update(col2code)
 
     joint_features = reduce(lambda x, y: pd.merge(x, y, left_index=True, right_index=True, how='outer'), joint_features)
-    
-    return joint_features, ftr_col2code
 
-
-def load_separate_features(verbose=True, na=0):
-    """
-    get dummies, dummy_na=False
-    fillna with na if na is not None
-    """
-    features = {}
-    for name, fn in fn_features_dc.items():
-        if verbose:  print 'loading feature:', fn
-        df = pd.read_csv(dir_data + fn, index_col=0)
-        if index_seg in df.columns:
-            df.set_index('index_seg', inplace=True)
-        df = pd.get_dummies(df, dummy_na=False)
-        if na is not None:
-            df.fillna(na, inplace=True)
-        features[name] = df
-    return features
+    print 'fill the rest NA with 0'
+    joint_features.fillna(0, inplace=True)
+    return joint_features
 
 
 def filter_year(ftr, years=(2014, 2015, 2016, 2017), keep_year=False):
