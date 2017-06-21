@@ -138,9 +138,3 @@ if __name__ == "__main__":
                         print dtm.now(), 'experiment with', exp_param
                         gridcv_ready = scale_and_selection(train_x, train_y, test_x, test_y, selection_type, max_cut)
                         grid_eval(gridcv_ready, exp_param_path, ftr_name)
-                        break
-                    break
-                break
-            break
-        break
-
