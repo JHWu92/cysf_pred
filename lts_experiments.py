@@ -82,7 +82,7 @@ def grid_eval(ds, cv_dir, ftr_name):
     write_ftr_names(cv_dir, ftr_name, selected_ftr)
 
     print 'get models and grid_cv tuning parameters'
-    models = sk_models()
+    models = sk_models(stoplist=())
     order = [['cls', ['RFcls', 'BAGcls', 'GDBcls']]]
     params = grid_cv_default_params()
 
