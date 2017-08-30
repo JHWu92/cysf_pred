@@ -1,9 +1,9 @@
 import pandas as pd
 from wKit.ML.feature_selection import has_value_thres
 
-from constants import fn_features_dc, dir_data, features_for_total
+from .constants import fn_features_dc, dir_data, features_for_total
 from wKit.ML.dprep import fillna_group_mean
-
+from functools import reduce
 
 def load_features(lts, drop_na_thres=0.1, how='TOTAL', years=(2014, 2015, 2016, 2017), verbose=False):
     """
@@ -20,7 +20,7 @@ def load_features(lts, drop_na_thres=0.1, how='TOTAL', years=(2014, 2015, 2016, 
     joint_features = []
     cols_by_type = {}
     for name, fn in fn_features_dc.items():
-        if verbose: print 'loading', name, fn
+        if verbose: print('loading', name, fn)
         ftr = pd.read_csv(dir_data + fn, index_col=0)
         ftr = filter_year(ftr, years=years)
 
@@ -36,7 +36,7 @@ def load_features(lts, drop_na_thres=0.1, how='TOTAL', years=(2014, 2015, 2016, 
         # filter columns with too many NA
         keep_col = has_value_thres(ftr, thres=drop_na_thres)
         keep_col = keep_col[keep_col].index.tolist()
-        if verbose: print 'all columns #:', ftr.shape[1], 'columns pass NA thres:', len(keep_col), '\n'
+        if verbose: print ('all columns #:', ftr.shape[1], 'columns pass NA thres:', len(keep_col), '\n')
         num_org_cols += ftr.shape[1]
         num_filtered_cols += len(keep_col)
         ftr = ftr[keep_col]
@@ -50,9 +50,9 @@ def load_features(lts, drop_na_thres=0.1, how='TOTAL', years=(2014, 2015, 2016, 
 
     joint_features = reduce(lambda x, y: pd.merge(x, y, left_index=True, right_index=True, how='outer'), joint_features)
 
-    print 'filter columns with > 90% NAs', num_org_cols, '->', num_filtered_cols
-    print fillna_by_group_names, 'replace NA by seg type'
-    print 'fill the rest NA with 0'
+    print('filter columns with > 90% NAs', num_org_cols, '->', num_filtered_cols)
+    print(fillna_by_group_names, 'replace NA by seg type')
+    print('fill the rest NA with 0')
     joint_features.fillna(0, inplace=True)
     return joint_features, cols_by_type
 
