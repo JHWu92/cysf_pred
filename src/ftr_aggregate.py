@@ -5,14 +5,15 @@ from .constants import fn_features_dc, dir_data, features_for_total
 from wKit.ML.dprep import fillna_group_mean
 from functools import reduce
 
-def load_features(lts, drop_na_thres=0.1, how='TOTAL', years=(2014, 2015, 2016, 2017), verbose=False):
+def load_features(ys, drop_na_thres=0.1, how='TOTAL', years=(2014, 2015, 2016, 2017), verbose=False, y_column_name='lts'):
     """
     filter data with year month by year
     filter data to either total count only or divided by different types
-    filter data(columns) if has values< thres (whole population is decided by lts)
+    filter data(columns) if has values< thres (whole population is decided by ys.index)
     fill na with group means for ['moving', 'parking', 'crash']
     """
     seg_type = pd.read_csv('data/seg_street_type.csv')
+    seg_type = seg_type[seg_type['index'].isin(ys.index)]
     fillna_by_group_names = ['moving', 'parking', 'crash']
 
     num_org_cols = 0
@@ -31,7 +32,7 @@ def load_features(lts, drop_na_thres=0.1, how='TOTAL', years=(2014, 2015, 2016, 
         ftr = ftr.groupby(level=0).sum()
 
         # get complete list of segments
-        ftr = lts.merge(ftr, left_index=True, right_index=True, how='left').drop('LTS', axis=1)
+        ftr = ys.merge(ftr, left_index=True, right_index=True, how='left').drop(y_column_name, axis=1)
 
         # filter columns with too many NA
         keep_col = has_value_thres(ftr, thres=drop_na_thres)
