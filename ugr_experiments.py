@@ -7,9 +7,9 @@ from wKit.ML.feature_selection import fselect
 import os
 import pandas as pd
 import numpy as np
-from .src.constants import dir_data, fn_target_lts_dc, fn_features_dc
-from .src.ftr_aggregate import load_features
-from wKit.ML.sk_ml import sk_models, grid_cv_default_params, grid_cv_models, evaluate_grid_cv, evaluator_scalable_cls
+from src.constants import dir_data, fn_features_dc
+from src.ftr_aggregate import load_features
+from wKit.ML.sk_ml import sk_models, grid_cv_default_params, grid_cv_models, evaluate_grid_cv, evaluator_scalable_cls, model_order_by_speed
 from datetime import datetime as dtm
 
 def get_max_cut_cols(cols_by_type):
@@ -19,9 +19,9 @@ def get_max_cut_cols(cols_by_type):
         max_cut_cols += cols_by_type[c]
     return max_cut_cols
 
-def get_idx(lts, idx_fn, seed):
+def get_idx(ys, idx_fn, seed):
     if not os.path.exists(idx_fn):
-        train_idx, test_idx = train_test_split(lts.index, test_size=0.2, random_state=seed)
+        train_idx, test_idx = train_test_split(ys.index, test_size=0.2, random_state=seed)
         with open(idx_fn, 'w') as f:
             f.write('train\t%s\n' % ','.join(train_idx.astype(str).tolist()))
             f.write('test\t%s\n' % ','.join(test_idx.astype(str).tolist()))
@@ -72,7 +72,7 @@ def write_ftr_names(cv_dir, ftr_name, selected):
 
     keeps = np.array(ftr_name)[selected]
     removes = np.array(ftr_name)[~selected]
-    with open(os.path.join(cv_dir, 'feature_names.txt'), 'wb') as f:
+    with open(os.path.join(cv_dir, 'feature_names.txt'), 'w') as f:
         f.write('all\t%d' % len(ftr_name) + '\t' + ', '.join(ftr_name) + '\n')
         f.write('keeps\t%d' % len(keeps) + '\t' + ', '.join(keeps) + '\n')
         f.write('removes\t%d' % len(removes) + '\t' + ', '.join(removes) + '\n')
@@ -83,7 +83,7 @@ def grid_eval(ds, cv_dir, ftr_name):
 
     print('get models and grid_cv tuning parameters')
     models = sk_models(stoplist=())
-    order = model_order_by_speed(speed=0)
+    order = model_order_by_speed(speed=3)
     params = grid_cv_default_params()
 
     print('running grid cv')
@@ -102,7 +102,7 @@ if __name__ == "__main__":
     features = {}
     for total_or_not in totals:
         for year_type, years in years_choices:
-            ftrs, cols_by_type = load_features(lts, how=total_or_not, years=years)
+            ftrs, cols_by_type = load_features(ugr, how=total_or_not, years=years, y_column_name='ugr')
             features[(total_or_not, year_type)] = (ftrs, cols_by_type)
 
     ys = ugr.ugr
