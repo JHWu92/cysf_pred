@@ -22,3 +22,6 @@ exported_pipeline = make_pipeline(
 
 exported_pipeline.fit(training_features, training_target)
 results = exported_pipeline.predict(testing_features)
+
+#Best pipeline: ExtraTreesRegressor(LassoLarsCV(Binarizer(GradientBoostingRegressor(input_matrix, GradientBoostingRegressor__alpha=0.75, GradientBoostingRegressor__learning_rate=0.1, GradientBoostingRegressor__loss=DEFAULT, GradientBoostingRegressor__max_depth=4, GradientBoostingRegressor__max_features=0.3, GradientBoostingRegressor__min_samples_leaf=19, GradientBoostingRegressor__min_samples_split=7, GradientBoostingRegressor__n_estimators=100, GradientBoostingRegressor__subsample=0.2), Binarizer__threshold=0.8), LassoLarsCV__normalize=True), ExtraTreesRegressor__bootstrap=False, ExtraTreesRegressor__max_features=0.45, ExtraTreesRegressor__min_samples_leaf=5, ExtraTreesRegressor__min_samples_split=17, ExtraTreesRegressor__n_estimators=DEFAULT)
+#0.5193420325
