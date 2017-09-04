@@ -18,9 +18,9 @@ tpot.export('tpot_pipeline_reg_total2014_%s.py' % y_name)
 pred = tpot.predict(X_test).round()
 y_test = y_test.round()
 
-mse_train = mean_squared_error(y_test, pred)
-acc_train = accuracy_score(y_test, pred)
+mse= mean_squared_error(y_test, pred)
+acc= accuracy_score(y_test, pred)
 f1_weighted = f1_score(y_test, pred, average='weighted')
 f1_macro = f1_score(y_test, pred, average='macro')
 
-print('mse_train =', mse_train, 'acc_train =', acc_train,  'f1_weighted =', f1_weighted, 'f1_macro =', f1_macro)
+print('mse=', mse, 'acc=', acc,  'f1_weighted =', f1_weighted, 'f1_macro =', f1_macro)
