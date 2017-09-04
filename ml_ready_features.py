@@ -12,4 +12,4 @@ for total_or_not in totals:
     for year_type, years in years_choices:
         ftrs, cols_by_type = load_features(None, how=total_or_not, years=years, pair_with_y=False)
         features[(total_or_not, year_type)] = (ftrs, cols_by_type)
-        ftrs.to_csv('x_%s_%s.csv' %(total_or_not, year_type))
+        ftrs.to_csv('data/x_%s_%s.csv' %(total_or_not, year_type))
