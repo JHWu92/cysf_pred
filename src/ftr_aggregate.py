@@ -38,7 +38,8 @@ def load_features(ys, drop_na_thres=0.1, how='TOTAL', years=(2014, 2015, 2016, 2
         if pair_with_y:
             ftr = ys.merge(ftr, left_index=True, right_index=True, how='left').drop(y_column_name, axis=1)
         else:
-            ftr = seg_type.merge(ftr, left_on='index', right_index=True, how='left').drop('name', axis=1)
+            ftr = seg_type.set_index('index').merge(ftr, left_index=True, right_index=True, how='left').drop('name', axis=1)
+            ftr.index.name = 'index_seg'
 
         # filter columns with too many NA
         keep_col = has_value_thres(ftr, thres=drop_na_thres)
