@@ -7,7 +7,7 @@ from functools import reduce
 
 
 def load_features(ys, drop_na_thres=0.1, how='TOTAL', years=(2014, 2015, 2016, 2017), verbose=False,
-                  y_column_name='lts', pair_with_y=True):
+                  y_column_name='LTS', pair_with_y=True):
     """
     filter data with year month by year
     filter data to either total count only or divided by different types
