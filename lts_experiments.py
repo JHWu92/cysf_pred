@@ -72,7 +72,7 @@ def write_ftr_names(cv_dir, ftr_name, selected):
 
     keeps = np.array(ftr_name)[selected]
     removes = np.array(ftr_name)[~selected]
-    with open(os.path.join(cv_dir, 'feature_names.txt'), 'wb') as f:
+    with open(os.path.join(cv_dir, 'feature_names.txt'), 'w') as f:
         f.write('all\t%d' % len(ftr_name) + '\t' + ', '.join(ftr_name) + '\n')
         f.write('keeps\t%d' % len(keeps) + '\t' + ', '.join(keeps) + '\n')
         f.write('removes\t%d' % len(removes) + '\t' + ', '.join(removes) + '\n')
@@ -82,13 +82,13 @@ def grid_eval(ds, cv_dir, ftr_name):
     write_ftr_names(cv_dir, ftr_name, selected_ftr)
 
     print('get models and grid_cv tuning parameters')
-    models = sk_models(stoplist=('RFcls', 'BAGcls', 'GDBcls'))
+    models = sk_models()
     # order = [['cls', ['RFcls', 'BAGcls', 'GDBcls']]]
     order = model_order_by_speed(4)
     params = grid_cv_default_params()
 
     print('running grid cv')
-    df_cv_res = grid_cv_models(train_x, train_y, models, params, order=order, path=cv_dir, verbose=True)
+    df_cv_res = grid_cv_models(train_x, train_y, models, params, order=order, path=cv_dir, verbose=True, redo=True, redo_individual=False)
     print('saved grid cv result for each model')
 
     print('evaluating best model of each kind')
