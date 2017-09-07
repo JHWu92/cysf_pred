@@ -7,9 +7,9 @@ from wKit.ML.feature_selection import fselect
 import os
 import pandas as pd
 import numpy as np
-from .src.constants import dir_data, fn_target_lts_dc, fn_features_dc
-from .src.ftr_aggregate import load_features
-from wKit.ML.sk_ml import sk_models, grid_cv_default_params, grid_cv_models, evaluate_grid_cv, evaluator_scalable_cls
+from src.constants import dir_data, fn_target_lts_dc, fn_features_dc
+from src.ftr_aggregate import load_features
+from wKit.ML.sk_ml import sk_models, grid_cv_default_params, grid_cv_models, evaluate_grid_cv, evaluator_scalable_cls, model_order_by_speed
 from datetime import datetime as dtm
 
 def get_max_cut_cols(cols_by_type):
@@ -82,8 +82,9 @@ def grid_eval(ds, cv_dir, ftr_name):
     write_ftr_names(cv_dir, ftr_name, selected_ftr)
 
     print('get models and grid_cv tuning parameters')
-    models = sk_models(stoplist=())
-    order = [['cls', ['RFcls', 'BAGcls', 'GDBcls']]]
+    models = sk_models(stoplist=('RFcls', 'BAGcls', 'GDBcls'))
+    # order = [['cls', ['RFcls', 'BAGcls', 'GDBcls']]]
+    order = model_order_by_speed(4)
     params = grid_cv_default_params()
 
     print('running grid cv')
