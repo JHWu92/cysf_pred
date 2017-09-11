@@ -5,6 +5,36 @@ from .constants import fn_features_dc, dir_data, features_for_total
 from wKit.ML.dprep import fillna_group_mean
 from functools import reduce
 
+import os
+import pickle
+
+ROAD_NET_FTR = ['seg_attr', 'net_SaN', 'net_SaE', 'bk_osm', 'bk_opendc']
+SEGMENT_FTR = ['poi', 'crash', '311', 'v0', 'crime', 'moving', 'parking']
+SEG_TYPE_PATH = 'data/seg_street_type.csv'
+FILLNA_BY_GROUP_NAMES = ['moving', 'parking', 'crash']
+
+
+def load_features_v2(total_or_not='TOTAL', year_type='~2014', feature_type='RoadNet'):
+
+    years = {'~2014': (2014, 2015, 2016, 2017), '~2016': (2016, 2017)}[year_type]
+    Xs_fn = 'data/x_%s_%s.csv' %(total_or_not, year_type)
+    cols_by_type_fn = 'data/x_%s_%s_cols_by_type.pkl'%(total_or_not, year_type)
+
+    if os.path.exists(Xs_fn):
+        ftr = pd.read_csv(Xs_fn, index_col=0)
+        cols_by_type = pickle.load(open(cols_by_type_fn , 'rb'))
+    else:
+        ftr, cols_by_type = load_features(None,how=total_or_not, years=years, pair_with_y=False)
+
+    keep_ftr = []
+    keep_ftr_type = {'RoadNet': ROAD_NET_FTR, 'Segment': SEGMENT_FTR,
+                     'RoadNet+Segment': ROAD_NET_FTR + SEGMENT_FTR}[feature_type]
+    for ftr_type, ftr_cols in cols_by_type.items():
+        if ftr_type in keep_ftr_type:
+            keep_ftr += ftr_cols
+
+    return ftr[keep_ftr]
+
 
 def load_features(ys, drop_na_thres=0.1, how='TOTAL', years=(2014, 2015, 2016, 2017), verbose=False,
                   y_column_name='LTS', pair_with_y=True):
@@ -14,10 +44,9 @@ def load_features(ys, drop_na_thres=0.1, how='TOTAL', years=(2014, 2015, 2016, 2
     filter data(columns) if has values< thres (whole population is decided by ys.index)
     fill na with group means for ['moving', 'parking', 'crash']
     """
-    seg_type = pd.read_csv('data/seg_street_type.csv')
+    seg_type = pd.read_csv(SEG_TYPE_PATH)
     if pair_with_y:
         seg_type = seg_type[seg_type['index'].isin(ys.index)]
-    fillna_by_group_names = ['moving', 'parking', 'crash']
 
     num_org_cols = 0
     num_filtered_cols = 0
@@ -51,7 +80,7 @@ def load_features(ys, drop_na_thres=0.1, how='TOTAL', years=(2014, 2015, 2016, 2
         cols_by_type[name] = keep_col
 
         # fillna by means of segment types, if applicable
-        if name in fillna_by_group_names:
+        if name in FILLNA_BY_GROUP_NAMES:
             ftr = fillna_group_mean(ftr, seg_type)
 
         joint_features.append(ftr)
@@ -59,7 +88,7 @@ def load_features(ys, drop_na_thres=0.1, how='TOTAL', years=(2014, 2015, 2016, 2
     joint_features = reduce(lambda x, y: pd.merge(x, y, left_index=True, right_index=True, how='outer'), joint_features)
 
     print('filter columns with > 90% NAs', num_org_cols, '->', num_filtered_cols)
-    print(fillna_by_group_names, 'replace NA by seg type')
+    print(FILLNA_BY_GROUP_NAMES, 'replace NA by seg type')
     print('fill the rest NA with 0')
     joint_features.fillna(0, inplace=True)
     return joint_features, cols_by_type
