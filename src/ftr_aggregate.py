@@ -8,7 +8,7 @@ from functools import reduce
 import os
 import pickle
 
-ROAD_NET_FTR = ['seg_attr', 'net_SaN', 'net_SaE', 'bk_osm', 'bk_opendc']
+ROAD_NET_FTR = ['seg_attr', 'net_SaN', 'net_SaE', 'bk_osm', 'bk_opendc', 'elevation']
 SEGMENT_FTR = ['poi', 'crash', '311', 'v0', 'crime', 'moving', 'parking']
 SEG_TYPE_PATH = 'data/seg_street_type.csv'
 FILLNA_BY_GROUP_NAMES = ['moving', 'parking', 'crash']

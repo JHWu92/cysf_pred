@@ -85,23 +85,25 @@ fn_feature_crime_dc = 'feature_crime_dc.csv'
 fn_feature_mov_dc = 'feature_mov_violations_dc.csv'
 fn_feature_parking_dc = 'feature_parking_violations_dc.csv'
 fn_feature_oepndc_bk_dc = 'feature_bk_opendc_dc.csv'
-
+fn_feature_elevation_dc = 'feature_elevation_diff_dc.csv '
 # features that are meaningful to have a "total" count column.
 features_for_total = ['crash', '311', 'crime', 'v0', 'moving', 'parking', 'poi', 'bk_opendc']
 
 fn_features_dc = {
     'seg_attr': fn_feature_seg_attr_dc,
-    'poi': fn_feature_poi_dc, 
-    'bk_osm': fn_feature_bk_facs_dc, 
+    'elevation': fn_feature_elevation_dc,
     'net_SaN': fn_feature_seg_as_node_dc, 
-    'net_SaE': fn_feature_seg_as_edge_dc, 
+    'net_SaE': fn_feature_seg_as_edge_dc,
+    'bk_osm': fn_feature_bk_facs_dc,
+    'bk_opendc': fn_feature_oepndc_bk_dc,
+    'poi': fn_feature_poi_dc,
     'crash': fn_feature_crash_dc,
     '311': fn_feature_311_dc, 
     'v0': fn_feature_vision0_dc, 
     'crime': fn_feature_crime_dc, 
     'moving': fn_feature_mov_dc, 
-    'parking': fn_feature_parking_dc, 
-    'bk_opendc': fn_feature_oepndc_bk_dc}
+    'parking': fn_feature_parking_dc,
+    }
 
 fn_target_lts_dc = 'feature_lts_dc.csv'
 
