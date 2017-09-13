@@ -116,7 +116,7 @@ if __name__ == "__main__":
 
 
     # for seed in [0, 100, 972, 5258, 7821, 40918, 57852, 168352, 291592, 789729423]:
-    for seed in [0]:
+    for seed in [7821, 40918, 57852, 168352, 291592, 789729423]:
         for frac in [0.2, 0.4, 0.6, 0.8]:
             exp_path = 'data/downsample_experiment/seed_%d/frac_%.2f' % (seed, frac)
             mkdirs_if_not_exist(exp_path)
