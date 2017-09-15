@@ -97,7 +97,7 @@ def grid_eval(ds, cv_dir, ftr_name):
     params = grid_cv_default_params()
 
     print('running grid cv')
-    df_cv_res = grid_cv_models(train_x, train_y, models, params, order=order, path=cv_dir, verbose=True)
+    df_cv_res = grid_cv_models(train_x, train_y, models, params, order=order, path=cv_dir, verbose=True, redo=True)
     print('saved grid cv result for each model')
 
     print('evaluating best model of each kind')
