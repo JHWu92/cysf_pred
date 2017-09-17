@@ -73,7 +73,7 @@ def load_features(ys, drop_na_thres=0.1, how='TOTAL', years=(2014, 2015, 2016, 2
         # filter columns with too many NA
         keep_col = has_value_thres(ftr, thres=drop_na_thres)
         keep_col = keep_col[keep_col].index.tolist()
-        if verbose: print ('all columns #:', ftr.shape[1], 'columns pass NA thres:', len(keep_col), '\n')
+        if verbose: print (name, 'all columns #:', ftr.shape[1], 'columns pass NA thres:', len(keep_col), '\n')
         num_org_cols += ftr.shape[1]
         num_filtered_cols += len(keep_col)
         ftr = ftr[keep_col]
