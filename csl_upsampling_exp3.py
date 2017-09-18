@@ -57,12 +57,13 @@ def get_total_or_type(total_or_not):
 
 
 def up_exp(smote_kind, combos, y, Xs):
-    for seed in SEEDS:
+    for seed in SEEDS:  # the last seed raise 'Expected n_neighbors <= n_samples,  but n_samples = 5, n_neighbors = 6' in smote.fit_sample
         # set up experiment path
         exp_path = 'data/up_down_experiment/seed_%d' % seed
         upsample_path = '%s/upsample_smote_%s' % (exp_path, smote_kind)
         mkdirs_if_not_exist(exp_path)
         mkdirs_if_not_exist(upsample_path)
+        print('upsample_path', upsample_path)
 
         # get train/test index
         idx_fn = '%s/%s' % (exp_path, 'indices.txt')
@@ -70,7 +71,9 @@ def up_exp(smote_kind, combos, y, Xs):
 
         # get train_y and test_y
         train_y, test_y = y.loc[train_idx], y.loc[test_idx]
-    #     uped_train_y = upsample(train_y)
+        y_dist = train_y.value_counts().to_dict()
+        print('train_y: %s' % (str(y_dist)))
+        #     uped_train_y = upsample(train_y)
 
         # store result
         df_grid_res, df_eval_res = [], []
@@ -85,6 +88,8 @@ def up_exp(smote_kind, combos, y, Xs):
             # oversample train_x and train_y
             upsampler = SMOTE(kind=smote_kind, random_state=10)
             up_train_x, up_train_y = upsampler.fit_sample(train_x, train_y)
+            up_y_dist = pd.Series(up_train_y).value_counts().to_dict()
+            print('trainy: %s, up_train_y: %s' % (str(y_dist), str(up_y_dist)))
 
             # for each combo, do a feature slection experiment
             for fselect_type in FSELECT_TYPE:
@@ -107,6 +112,8 @@ def up_exp(smote_kind, combos, y, Xs):
                 eval_res['feature_selection'] = fselect_type
                 eval_res['#all'] = len(feature_names)
                 eval_res['#keep'] = dset['selected_ftr'].sum()
+                eval_res['up_y_dist'] = up_y_dist
+                eval_res['y_dist'] = y_dist
                 print('feature selection: %d -> %d' %(len(feature_names), dset['selected_ftr'].sum()))
                 df_eval_res.append(eval_res)
                 # save feature importances
@@ -126,14 +133,16 @@ def up_exp(smote_kind, combos, y, Xs):
         df_eval_res = pd.DataFrame(df_eval_res)
         df_eval_res.to_csv('%s/eval_res.csv' % upsample_path)
         # break  # run one seed
+        print('finished seed %d' % seed)
 
 
 def main():
     Xs, y = load_data()
-    y = y.round()
+    y = y.round().astype(int)
     combos = [('TOTAL', 'XGBcls'), ('NO_TOTAL', 'XGBreg'), ('TOTAL', 'GDBcls')]
     smote_kinds = ['regular', 'svm']
-    for smote_kind in smote_kinds:
+    for smote_kind in smote_kinds[1:]:
+        print('running', smote_kind)
         up_exp(smote_kind=smote_kind, combos=combos, y=y, Xs=Xs)
 
 
