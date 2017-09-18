@@ -11,7 +11,7 @@ from wKit.ML.sk_ml import (sk_models, grid_cv_default_params, grid_cv_models, ev
 SEEDS = [0, 100, 972, 5258, 7821, 40918, 57852, 168352, 291592, 789729423]
 TEST_SIZE = 0.2
 MAX_CUTOFF_CANDIDATES = ['crash', '311', 'poi', 'crime', 'v0', 'moving', 'parking']
-
+FSELECT_TYPE = ['None', 'rfecv_linsvc', 'mrmr']
 
 def get_max_cut_cols(cols_by_type):
     max_cut_cols = []
