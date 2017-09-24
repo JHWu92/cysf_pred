@@ -45,7 +45,7 @@ def up_exp_one_run(upsample_path, smote_kind, model_names, y, Xs, train_idx, tes
         grid_res['ftr_combo_name'] = ftr_combo_name
         grid_res['feature_selection'] = fselect_type
         model = grid_res.pop('best_model')
-        df_grid_res.append(grid_res)
+        grid_res_list.append(grid_res)
         return model
 
     def eval_on_test():
@@ -57,7 +57,7 @@ def up_exp_one_run(upsample_path, smote_kind, model_names, y, Xs, train_idx, tes
         eval_res['#keep'] = dset['selected_ftr'].sum()
         eval_res['up_y_dist'] = up_y_dist
         eval_res['y_dist'] = y_dist
-        df_eval_res.append(eval_res)
+        eval_res_list.append(eval_res)
 
     # get train_y and test_y
     train_y, test_y = y.loc[train_idx], y.loc[test_idx]
@@ -65,7 +65,7 @@ def up_exp_one_run(upsample_path, smote_kind, model_names, y, Xs, train_idx, tes
     print('train_y: %s' % (str(y_dist)))
 
     # store result
-    df_grid_res, df_eval_res = [], []
+    grid_res_list, eval_res_list = [], []
 
     # iterate combos
     for ftr_combo_name, X in Xs.items():
@@ -97,9 +97,9 @@ def up_exp_one_run(upsample_path, smote_kind, model_names, y, Xs, train_idx, tes
             for name in model_names:
                 # init model
                 model, param = init_model_params(name)
-                # grid a model, save grid_res to df_grid_res
+                # grid a model, save grid_res to grid_res_list
                 model = grid(model)
-                # evaluate on original test set, save eval_res to df_eval_res
+                # evaluate on original test set, save eval_res to eval_res_list
                 eval_on_test()
                 # save feature importances
                 imp = show_important_features(model, labels=feature_names, set_std=False, show_plt=False).drop('std', axis=1)
@@ -110,9 +110,9 @@ def up_exp_one_run(upsample_path, smote_kind, model_names, y, Xs, train_idx, tes
                 cfsn.to_csv('%s/cfsn-%s.csv' % (cv_path, name))
 
         # df_res is for a whole run of up_exp, but save to disk with overwrite once a combo is done
-        df_grid_res = pd.DataFrame(df_grid_res)
+        df_grid_res = pd.DataFrame(grid_res_list)
         df_grid_res.to_csv('%s/grid_res.csv' % upsample_path)
-        df_eval_res = pd.DataFrame(df_eval_res)
+        df_eval_res = pd.DataFrame(eval_res_list)
         df_eval_res.to_csv('%s/eval_res.csv' % upsample_path)
         # break    # run one combo
 
@@ -132,8 +132,8 @@ def up_exp(smote_kind, model_names, y, Xs):
         print('begin one run exp, in upsample_path=%s' % upsample_path)
         up_exp_one_run(upsample_path, smote_kind, model_names, y, Xs, train_idx, test_idx, seed)
 
-        # break  # run one seed
         print('finished seed %d' % seed)
+        break  # run one seed
 
 
 def main():
