@@ -133,7 +133,7 @@ def up_exp(smote_kind, model_names, y, Xs):
         up_exp_one_run(upsample_path, smote_kind, model_names, y, Xs, train_idx, test_idx, seed)
 
         print('finished seed %d' % seed)
-        break  # run one seed
+        # break  # run one seed
 
 
 def main():
