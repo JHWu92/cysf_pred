@@ -172,13 +172,13 @@ def exp_else(ys, train_idx, test_idx, exp_path):
 
 def main():
     warnings.filterwarnings("ignore", category=UndefinedMetricWarning)
-    csl = pd.read_csv('data/y_csl_all.csv', index_col=0)
+    csl = pd.read_csv(CSL_FN, index_col=0)
     ys = csl.csl
     target_index_seg = ys.index
     mode_of_round_y = ys.round().mode().values[0]
 
     for seed in [0, 100, 972, 5258, 7821, 40918, 57852, 168352, 291592, 789729423]:
-        exp_path = 'data/csl_experiment/seed_%d' % seed
+        exp_path = 'experiment/exp1/seed_%d' % seed
         mkdirs_if_not_exist(exp_path)
         print(dtm.now(), 'experiment top dir =', exp_path)
 
@@ -191,4 +191,5 @@ def main():
 
 
 if __name__ == '__main__':
+    CSL_FN = 'data/y_csl_all_0929.csv'
     main()

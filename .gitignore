@@ -143,10 +143,11 @@ Untitled.ipynb
 data/experiment
 data/ugr_experiment
 data/downsample_experiment
-data/csl_experiment
+data/exp1
 data/up_down_experiment
 data/up_down_experiment_v2
 data/up_down_experiment_v2.zip
+data/exp4
 
 data/y.csv
 data/x_total_2016.csv
