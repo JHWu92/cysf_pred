@@ -146,6 +146,8 @@ data/downsample_experiment
 data/csl_experiment
 data/up_down_experiment
 data/up_down_experiment_v2
+data/up_down_experiment_v2.zip
+
 data/y.csv
 data/x_total_2016.csv
 data/x_nototal_2016.csv
