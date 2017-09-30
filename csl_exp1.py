@@ -1,13 +1,15 @@
 # coding=utf-8
-import os
 import warnings
+from sklearn.exceptions import UndefinedMetricWarning
+warnings.filterwarnings("ignore", category=UndefinedMetricWarning)
+
+import os
 from datetime import datetime as dtm
 import pickle
 import numpy as np
 import pandas as pd
 from sklearn.metrics import f1_score
 from sklearn.model_selection import train_test_split
-from sklearn.exceptions import UndefinedMetricWarning
 
 from wKit.ML.feature_selection import fselect
 from wKit.ML.scaler import minmax, max_cutoff
@@ -171,7 +173,7 @@ def exp_else(ys, train_idx, test_idx, exp_path):
 
 
 def main():
-    warnings.filterwarnings("ignore", category=UndefinedMetricWarning)
+    start_time = dtm.now()
     csl = pd.read_csv(CSL_FN, index_col=0)
     ys = csl.csl
     target_index_seg = ys.index
@@ -189,6 +191,8 @@ def main():
         exp_roadnet(ys, train_idx, test_idx, exp_path)
         exp_else(ys, train_idx, test_idx, exp_path)
 
+    end_time = dtm.now()
+    print('start at:', start_time, 'end at:', end_time)
 
 if __name__ == '__main__':
     CSL_FN = 'data/y_csl_all_0929.csv'
