@@ -95,6 +95,6 @@ def grid_eval(ds, cv_dir, ftr_name):
     print('saved grid cv result for each model')
 
     print('evaluating best model of each kind')
-    df_eval = evaluate_grid_cv(df_cv_res, train_x, train_y, test_x, test_y, evaluator_scalable_cls, path=cv_dir)
+    df_eval = evaluate_grid_cv(df_cv_res, train_x, train_y, test_x, test_y, evaluator_scalable_cls, path=cv_dir, range=(1,5))
     print()
     return df_eval
