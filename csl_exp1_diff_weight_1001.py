@@ -211,6 +211,7 @@ def exp1_one_y(y, weight_name):
 def main():
     start_time = dtm.now()
     for weight_name in ['3level', 'lvl_fearless_1st', 'lvl_reluctant_1st', 'fam_include_noinfo', 'fam_exclude_noinfo'][:1]:
+        print('weight_name',weight_name)
         fn = 'data/y_csl_all_%s-2017-10-01.csv' % weight_name
         csl = pd.read_csv(fn, index_col=0)
         y = csl.csl
