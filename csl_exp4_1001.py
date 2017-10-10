@@ -8,7 +8,7 @@ import os
 import pandas as pd
 import xgboost
 from imblearn.over_sampling import SMOTE
-from sklearn.ensemble import GradientBoostingClassifier, BaggingClassifier
+from sklearn.ensemble import GradientBoostingClassifier, BaggingClassifier, RandomForestRegressor
 from wKit.ML.sk_ml import grid_cv_a_model, grid_cv_default_params, evaluator_scalable_cls
 
 from wKit.utility.file_sys import mkdirs_if_not_exist
@@ -43,6 +43,9 @@ def init_model_params(name):
     elif name == 'GDBcls':
         model = GradientBoostingClassifier()
         param = params['cls']['GDBcls']
+    elif name == 'RFreg':
+        model = RandomForestRegressor()
+        param = params['reg']['RFreg']
     else: raise('no model')
     return model, param
 
@@ -158,6 +161,7 @@ if __name__ == '__main__':
         # ('XGBreg', 'svm', 'rfecv_linsvc'),
         ('GDBcls', 'None', 'None'),
         # ('GDBcls', 'svm', 'mrmr'),
+        ('RFreg', 'None', 'None'),
     ]
     SMOTE_SEED = 10
     main()

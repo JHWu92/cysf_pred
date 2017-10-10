@@ -6,7 +6,7 @@ warnings.filterwarnings("ignore", category=UndefinedMetricWarning)
 import pandas as pd
 from datetime import datetime as dtm
 from imblearn.over_sampling import SMOTE
-from sklearn.ensemble import GradientBoostingClassifier, BaggingClassifier
+from sklearn.ensemble import GradientBoostingClassifier, BaggingClassifier, RandomForestRegressor
 import xgboost
 
 from wKit.ML.sk_ml import (grid_cv_a_model, grid_cv_default_params, evaluator_scalable_cls,
@@ -38,6 +38,9 @@ def init_model_params(name):
     elif name == 'GDBcls':
         model = GradientBoostingClassifier()
         param = params['cls']['GDBcls']
+    elif name == 'RFreg':
+        model = RandomForestRegressor()
+        param = params['reg']['RFreg']
     else: raise('no model')
     return model, param
 
@@ -147,7 +150,7 @@ def main():
     start_time = dtm.now()
     Xs, y = load_data()
     y = y.round().astype(int)
-    model_names = ['XGBcls', 'BAGcls', 'GDBcls']
+    model_names = ['XGBcls', 'BAGcls', 'GDBcls', 'RFreg']
     smote_kinds = ['regular', 'svm']
     for smote_kind in smote_kinds:
         print('running', smote_kind)

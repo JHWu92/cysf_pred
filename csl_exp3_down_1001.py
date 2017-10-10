@@ -5,7 +5,7 @@ warnings.filterwarnings("ignore", category=UndefinedMetricWarning)
 
 import pandas as pd
 from datetime import datetime as dtm
-from sklearn.ensemble import GradientBoostingClassifier, BaggingClassifier
+from sklearn.ensemble import GradientBoostingClassifier, BaggingClassifier, RandomForestRegressor
 import xgboost
 from imblearn.under_sampling import RandomUnderSampler
 from wKit.ML.sk_ml import (grid_cv_a_model, grid_cv_default_params, evaluator_scalable_cls,
@@ -37,6 +37,9 @@ def init_model_params(name):
     elif name == 'GDBcls':
         model = GradientBoostingClassifier()
         param = params['cls']['GDBcls']
+    elif name == 'RFreg':
+        model = RandomForestRegressor()
+        param = params['reg']['RFreg']
     else: raise('no model')
     return model, param
 
@@ -144,7 +147,7 @@ def down_exp(model_names, y, Xs):
 def main():
     start_time = dtm.now()
     Xs, y = load_data()
-    model_names = ['XGBcls', 'BAGcls', 'GDBcls']
+    model_names = ['XGBcls', 'BAGcls', 'GDBcls', 'RFreg']
     down_exp(model_names=model_names, y=y, Xs=Xs)
     end_time = dtm.now()
     print('start at:', start_time, 'end at:', end_time)
