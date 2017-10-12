@@ -3,6 +3,7 @@ import warnings
 from sklearn.exceptions import UndefinedMetricWarning
 warnings.filterwarnings("ignore", category=UndefinedMetricWarning)
 
+from datetime import datetime as dtm
 import glob
 import os
 import pandas as pd
@@ -147,11 +148,15 @@ def exp4(Xs, y, qa):
 
 
 def main():
+    start_time = dtm.now()
     Xs, ys = load_data()
     for qa, y in ys.items():
         print(qa)
         exp4(Xs, y, qa)
         # break
+
+    end_time = dtm.now()
+    print('start at:', start_time, 'end at:', end_time)
 
 if __name__ == '__main__':
     MODEL_UP_FSEL_NAMES = [
