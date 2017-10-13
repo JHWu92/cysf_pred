@@ -163,7 +163,7 @@ if __name__ == '__main__':
     MODEL_UP_FSEL_NAMES = [
         ('XGBcls', 'None', 'None'),
         ('BAGcls', 'None', 'None'),
-        ('GDBcls', 'None', 'None'),
+        # ('GDBcls', 'None', 'None'),
         ('RFreg', 'None', 'None'),
     ]
     SMOTE_SEED = 10
