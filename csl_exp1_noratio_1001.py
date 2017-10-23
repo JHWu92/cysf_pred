@@ -195,7 +195,7 @@ def exp1_one_y(y, weight_name):
     target_index_seg = y.index
     mode_of_round_y = y.round().mode().values[0]
 
-    for seed in [0, 100, 972, 5258, 7821, 40918, 57852, 168352, 291592, 789729423][:4]:
+    for seed in [0, 100, 972, 5258, 7821, 40918, 57852, 168352, 291592, 789729423][4:]:
         exp_path = 'experiment_1001/exp1_noratio/%s/seed_%d' % (weight_name, seed)
         mkdirs_if_not_exist(exp_path)
         print(dtm.now(), 'experiment top dir =', exp_path)
@@ -211,14 +211,14 @@ def exp1_one_y(y, weight_name):
 def main():
     start_time = dtm.now()
     for weight_name in ['no_weight',
-                         'lvl_fearless_1st',
-                          # 'ext_lvl_fearless_1st',
-                         'lvl_reluctant_1st',
+                        # 'lvl_fearless_1st',
+                        #  'lvl_reluctant_1st',
+                        #  'fam_include_noinfo',
+                        #  'fam_exclude_noinfo',
+                         'ext_lvl_fearless_1st',
                          # 'ext_lvl_reluctant_1st',
-                         'fam_include_noinfo',
                          # 'ext_fam_include_noinfo',
-                         'fam_exclude_noinfo',
-                         # 'ext_fam_exclude_noinfo',
+                         'ext_fam_exclude_noinfo',
                          # 'f10_c1_i1_r10',
                          # 'nf30_f1_unk1',
                          ]:
