@@ -195,7 +195,7 @@ def exp1_one_y(y, weight_name):
     target_index_seg = y.index
     mode_of_round_y = y.round().mode().values[0]
 
-    for seed in [0, 100, 972, 5258, 7821, 40918, 57852, 168352, 291592, 789729423][4:]:
+    for seed in [0, 100, 972, 5258, 7821, 40918, 57852, 168352, 291592, 789729423]:
         exp_path = 'experiment_1001/exp1_diff_weight/%s/seed_%d' % (weight_name, seed)
         mkdirs_if_not_exist(exp_path)
         print(dtm.now(), 'experiment top dir =', exp_path)
@@ -218,8 +218,9 @@ def main():
         # 'nf30_f1_unk1',
         # 'gp_fam', 'gp_fam_f3-uk2-uf1', 'gp_fam_f100-uk50-uf1',
         # 'gp_lvl',
-        'gp_lvl_f4-c3-i2-r1',
+        # 'gp_lvl_f4-c3-i2-r1',
         # 'gp_lvl_f100-c66-i33-r1',
+        'lvl_fearless_1st_fam_include_noinfo', 'lvl_reluctant_1st_fam_include_noinfo',
     ]:
         print('weight_name',weight_name)
         fn = 'data/y_csl_all_%s-2017-10-01.csv' % weight_name
