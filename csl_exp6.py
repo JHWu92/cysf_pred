@@ -113,7 +113,7 @@ def grid_eval(ds, cv_dir, ftr_name):
     params = grid_cv_default_params()
 
     print('running grid cv')
-    df_cv_res = grid_cv_models(train_x, train_y, models, params, order=order, path=cv_dir, verbose=True, redo=True)
+    df_cv_res = grid_cv_models(train_x, train_y, models, params, order=order, path=cv_dir, verbose=True, redo=True, n_jobs=6)
     print('saved grid cv result for each model')
 
     print('evaluating best model of each kind')
@@ -122,7 +122,7 @@ def grid_eval(ds, cv_dir, ftr_name):
 
     print('get confusion matrix and feature importance')
     selected_ftr_name = np.array(ftr_name)[selected_ftr]
-    cfsn_imp(df_cv_res, cv_dir, selected_ftr_name, test_x, test_y)
+    # cfsn_imp(df_cv_res, cv_dir, selected_ftr_name, test_x, test_y)
 
     return df_eval
 
@@ -195,8 +195,8 @@ def exp1_one_y(y, weight_name):
     target_index_seg = y.index
     mode_of_round_y = y.round().mode().values[0]
 
-    for seed in [0, 100, 972, 5258, 7821, 40918, 57852, 168352, 291592, 789729423][4:]:
-        exp_path = 'experiment_1001/exp7/%s/seed_%d' % (weight_name, seed)
+    for seed in [0, 100, 972, 5258, 7821, 40918, 57852, 168352, 291592, 789729423][5:]:
+        exp_path = 'experiment_1001/exp6/%s/seed_%d' % (weight_name, seed)
         mkdirs_if_not_exist(exp_path)
         print(dtm.now(), 'experiment top dir =', exp_path)
 
@@ -212,11 +212,14 @@ def main():
     start_time = dtm.now()
     for weight_name in [
         # '4lvl',
-        'amplify_fcir', 'amplify_fr',
-        'lvl_fearless_1st', 'ext_lvl_fearless_1st',
-        'lvl_reluctant_1st', 'ext_lvl_reluctant_1st',
-        'fam_include_noinfo', 'ext_fam_include_noinfo',
-        'fam_exclude_noinfo', 'ext_fam_exclude_noinfo',
+        # 'amplify_fcir', 'amplify_fr',
+        # 'lvl_fearless_1st', 'ext_lvl_fearless_1st',
+        # 'lvl_reluctant_1st', 'ext_lvl_reluctant_1st',
+        # 'fam_include_noinfo', 'ext_fam_include_noinfo',
+        # 'fam_exclude_noinfo', 'ext_fam_exclude_noinfo',
+        'amplify_fcir2',
+        # 'amplify_fcir3',
+        # 'amplify_fcir3_fam_include_noinfo',
     ]:
         if weight_name != '4lvl':
             weight_name = '4lvl_' + weight_name

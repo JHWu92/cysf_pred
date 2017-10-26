@@ -210,7 +210,13 @@ def exp1_one_y(y, weight_name):
 
 def main():
     start_time = dtm.now()
-    for amp in ['amplify_fcir', 'amplify_fr']:
+    for amp in [
+        # 'amplify_fcir', 'amplify_fr',
+        # 'amplify_fcir2',
+        # 'amplify_fcir3',
+        # 'amplify_fcir_fam_include_noinfo',
+        'amplify_fcir3_fam_include_noinfo',
+    ]:
         print('amplify',amp)
         fn = 'data/y_csl_all_%s-2017-10-01.csv' % amp
         csl = pd.read_csv(fn, index_col=0)
