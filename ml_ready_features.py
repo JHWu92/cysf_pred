@@ -1,5 +1,5 @@
 # coding=utf-8
-
+# DEPRECATED
 from src.ftr_aggregate import load_features
 import pandas as pd
 from src.constants import dir_data
