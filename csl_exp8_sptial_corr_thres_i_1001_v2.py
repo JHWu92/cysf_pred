@@ -5,16 +5,14 @@ from sklearn.exceptions import UndefinedMetricWarning
 warnings.filterwarnings("ignore", category=UndefinedMetricWarning)
 
 from datetime import datetime as dtm
-import pickle
 import pandas as pd
+import pickle
 import xgboost
-from imblearn.over_sampling import SMOTE
 from sklearn.ensemble import BaggingClassifier
 from wKit.ML.sk_ml import grid_cv_a_model, grid_cv_default_params, evaluator_scalable_cls
 
 from wKit.utility.file_sys import mkdirs_if_not_exist
 from src.experiment_based_function import *
-
 
 ROAD_NET_FTR = ['seg_attr', 'net_SaN', 'net_SaE', 'bk_osm', 'bk_opendc', 'elevation']
 SEGMENT_FTR = ['poi', 'crash', '311', 'v0', 'crime', 'moving', 'parking']
@@ -88,19 +86,12 @@ def init_model_params(name):
 
 
 def exp8_one_run(exp_path, Xs, y, train_idx, test_idx):
-    def upsampling():
-        upsampler = SMOTE(kind=up_name, random_state=SMOTE_SEED)
-        up_train_x, up_train_y = upsampler.fit_sample(train_x, train_y.round())
-        up_y_dist = pd.Series(up_train_y).value_counts().to_dict()
-        return up_train_x, up_train_y, up_y_dist
-
     def grid(model):
         grid_res = grid_cv_a_model(dset['train_x'], dset['train_y'], model, param, kind=model_name[-3:],
                                    name=model_name,
                                    path=cv_path)
         grid_res['ftr_combo_name'] = ftr_combo_name
         grid_res['feature_selection'] = fselect_type
-        grid_res['upsample'] = up_name
         model = grid_res.pop('best_model')
         grid_res_list.append(grid_res)
         return model
@@ -110,16 +101,15 @@ def exp8_one_run(exp_path, Xs, y, train_idx, test_idx):
         eval_res['ftr_combo_name'] = ftr_combo_name
         eval_res['model_name'] = model_name
         eval_res['feature_selection'] = fselect_type
-        eval_res['upsample'] = up_name
         eval_res['train_n_classes'] = train_n_classes
         eval_res['test_n_classes'] = test_n_classes
         eval_res['#ftr_all'] = len(feature_names)
         eval_res['#ftr_keep'] = dset['selected_ftr'].sum()
-        eval_res['#train_sample'] = up_train_y.shape[0] if up_name != 'None' else train_y.shape[0]
+        eval_res['#train_sample'] = train_y.shape[0]
         eval_res['#test_sample'] = test_y.shape[0]
-        eval_res['y_dist_up'] = up_y_dist if up_name != 'None' else None
         eval_res['y_dist'] = y_dist
         eval_res_list.append(eval_res)
+
     # get train_y and test_y
     train_y, test_y = y.loc[train_idx], y.loc[test_idx]
     train_n_classes = train_y.round().nunique()
@@ -138,31 +128,12 @@ def exp8_one_run(exp_path, Xs, y, train_idx, test_idx):
         train_x, test_x = X.loc[train_idx], X.loc[test_idx]
         feature_names = train_x.columns
 
-        for model_name, up_name, fselect_type in MODEL_UP_FSEL_NAMES:
-            print('============%s,%s,%s' % (model_name, up_name, fselect_type))
-            if up_name != 'None':
-                try:
-                    up_train_x, up_train_y, up_y_dist = upsampling()
-                except ValueError as e:
-                    print('path=%s, ftr_combo_name=%s, smote=%s' % (exp_path, ftr_combo_name, up_name))
-                    print('catch a ValueError: %s' % e)
-                    continue
-                dset = scale_and_selection(up_train_x, up_train_y, test_x, test_y, fselect_type)
-            else:
-                dset = scale_and_selection(train_x, train_y, test_x, test_y, fselect_type)
+        for model_name, fselect_type in MODEL_NAMES:
+            print('============%s' % (model_name))
 
-            if fselect_type != 'None':
-                print('feature selection: %d -> %d' % (len(feature_names), dset['selected_ftr'].sum()))
-
-                if len(feature_names) == dset['selected_ftr'].sum():
-                    cv_path = '%s/%s#%s#%s-fselnothing' % (exp_path, ftr_combo_name, up_name, fselect_type)
-                    mkdirs_if_not_exist(cv_path)
-                    print('feature selection %s cut down nothing' % fselect_type)
-                    continue
-            else:
-                print('No Feature selection: %d' % len(feature_names))
-
-            cv_path = '%s/%s#%s#%s' % (exp_path, ftr_combo_name, up_name, fselect_type)
+            dset = scale_and_selection(train_x, train_y, test_x, test_y, fselect_type)
+            print('feature selection: %d -> %d' % (len(feature_names), dset['selected_ftr'].sum()))
+            cv_path = '%s/%s#%s' % (exp_path, ftr_combo_name, fselect_type)
             mkdirs_if_not_exist(cv_path)
             print('fitting models for cv_path=%s' % cv_path)
 
@@ -184,7 +155,7 @@ def exp8_one_run(exp_path, Xs, y, train_idx, test_idx):
 def exp8(Xs, y, i):
     for seed in SEEDS:
         # set up experiment path
-        exp_path = 'experiment_1001/exp8-spatial-thres-i-up-fsel/%s/seed_%d' % (i, seed)
+        exp_path = 'experiment_1001/exp8-spatial-thres-i/%s/seed_%d' % (i, seed)
         mkdirs_if_not_exist(exp_path)
         # get train/test index
         idx_fn = '%s/%s' % (exp_path, 'indices.txt')
@@ -196,12 +167,12 @@ def exp8(Xs, y, i):
 
 def main():
     start_time = dtm.now()
-    for i in [0.68]:
+    for i in [0.52, 0.54, 0.57, 0.60, 0.62, 0.64, 0.68, 0.69]:
         print('i =', i)
         i_str = '%0.2f' % i
         Xs, y = load_data(i)
         exp8(Xs, y, i_str)
-
+        # break
 
     # i_tail = '-Only'
     # i_str = 'Only'
@@ -213,21 +184,12 @@ def main():
 
 
 if __name__ == '__main__':
-    MODEL_UP_FSEL_NAMES = [
-        # ('XGBcls', 'None', 'None'),
-        ('XGBcls', 'None', 'rfecv_linsvc'),
-        ('XGBcls', 'svm', 'rfecv_linsvc'),
-        ('XGBcls', 'regular', 'rfecv_linsvc'),
-        ('XGBcls', 'None', 'mrmr'),
-        ('XGBcls', 'svm', 'mrmr'),
-        ('XGBcls', 'regular', 'mrmr'),
-        # ('BAGcls', 'None', 'None'),
-        ('BAGcls', 'None', 'rfecv_linsvc'),
-        ('BAGcls', 'svm', 'rfecv_linsvc'),
-        ('BAGcls', 'regular', 'rfecv_linsvc'),
-        ('BAGcls', 'None', 'mrmr'),
-        ('BAGcls', 'svm', 'mrmr'),
-        ('BAGcls', 'regular', 'mrmr'),
+    MODEL_NAMES = [
+        ('XGBcls', 'None'),
+        # ('XGBcls', 'rfecv_linsvc'),
+        # ('XGBcls', 'mrmr'),
+        ('BAGcls', 'None'),
+        # ('BAGcls', 'rfecv_linsvc'),
+        # ('BAGcls', 'mrmr'),
     ]
-    SMOTE_SEED = 10
     main()
