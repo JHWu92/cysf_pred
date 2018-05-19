@@ -97,8 +97,9 @@ def init_model_params(name):
     return model, param
 
 
-def exp8_one_run(exp_path, Xs, y, train_idx, test_idx, no_fsel=False, no_upsample=False):
+def exp8_one_run(exp_path, Xs, y, train_idx, test_idx, no_fsel=False, no_upsample=False, target_combo=False):
     def upsampling():
+        print('upsampling with smote %s' % up_name)
         upsampler = SMOTE(kind=up_name, random_state=SMOTE_SEED)
         up_train_x, up_train_y = upsampler.fit_sample(train_x, train_y.round())
         up_y_dist = pd.Series(up_train_y).value_counts().to_dict()
@@ -163,7 +164,16 @@ def exp8_one_run(exp_path, Xs, y, train_idx, test_idx, no_fsel=False, no_upsampl
                 print('skip upsample = %s' % up_name)
                 continue
 
-            print('============up=%s,fsel=%s' % (up_name, fselect_type))
+            if target_combo:
+                if (fselect_type, up_name) not in TO_RUN:
+                    print(fselect_type, up_name, 'not in TO RUN')
+                    continue
+                to_run_model = TO_RUN[(fselect_type, up_name)]
+            else:
+                to_run_model = MODEL_NAMES
+
+            print('============up=%s,fsel=%s, to run models: %s' % (up_name, fselect_type, str(to_run_model)))
+
             if up_name != 'None':
                 try:
                     up_train_x, up_train_y, up_y_dist = upsampling()
@@ -191,6 +201,9 @@ def exp8_one_run(exp_path, Xs, y, train_idx, test_idx, no_fsel=False, no_upsampl
             print('fitting models for cv_path=%s' % cv_path)
 
             for model_name in MODEL_NAMES:
+                if model_name not in to_run_model:
+                    print('skip model:', model_name)
+                    continue
                 # init model
                 model, param = init_model_params(model_name)
                 # grid a model, save grid_res to grid_res_list
@@ -206,7 +219,7 @@ def exp8_one_run(exp_path, Xs, y, train_idx, test_idx, no_fsel=False, no_upsampl
         # break    # run one combo
 
 
-def exp8(Xs, y, i, lvl, no_fsel=False, no_upsample=False):
+def exp8(Xs, y, i, lvl, no_fsel=False, no_upsample=False, target_combo=False):
     for seed in SEEDS:
         # set up experiment path
         exp_path = 'experiment_1001/exp10-34class/%s/%s/seed_%d' % (lvl, i, seed)
@@ -215,31 +228,43 @@ def exp8(Xs, y, i, lvl, no_fsel=False, no_upsample=False):
         idx_fn = '%s/%s' % (exp_path, 'indices.txt')
         train_idx, test_idx = get_idx(y.index, idx_fn, seed)
         print('====begin one run exp, in exp_path=%s' % exp_path)
-        exp8_one_run(exp_path, Xs, y, train_idx, test_idx, no_fsel=no_fsel, no_upsample=no_upsample)
+        exp8_one_run(exp_path, Xs, y, train_idx, test_idx, no_fsel=no_fsel, no_upsample=no_upsample, target_combo=target_combo)
         # break  # run one seed
 
 
 def main():
+    global TO_RUN
     start_time = dtm.now()
-    for i in [0, 0.1, 0.3, 0.5, 0.7, 0.8]:
-        no_fsel = False if i == 0 else True
-        no_upsample = False if i == 0 else True
+    no_fsel, no_upsample = False, False
+    target_combo = True
+    for i in [0, 0.1, 0.3, 0.5, 0.7, 0.8][1:]:
+        # no_fsel = False if i == 0 else True
+        # no_upsample = False if i == 0 else True
         for lvl in ['3lvl', '4lvl']:
-            print('i =', i, 'lvl =', lvl)
+            TO_RUN = TO_RUN_BY_LVL[lvl]
+            print('i =', i, 'lvl =', lvl, 'to run', TO_RUN)
             i_str = '%0.2f' % i
             Xs, y = load_data(i, lvl)
-            exp8(Xs, y, i_str, lvl, no_fsel=no_fsel, no_upsample=no_upsample)
+            exp8(Xs, y, i_str, lvl, no_fsel=no_fsel, no_upsample=no_upsample, target_combo=target_combo)
 
     end_time = dtm.now()
     print('start at:', start_time, 'end at:', end_time)
 
 
 if __name__ == '__main__':
-    # MODEL_NAMES = ['SVM', 'RFcls', 'XGBcls', 'BAGcls', 'GDBcls']
-    MODEL_NAMES = ['GDBcls']
+    MODEL_NAMES = ['SVM', 'RFcls', 'XGBcls', 'BAGcls', 'GDBcls']
     UP_NAMES = ['None', 'svm', 'regular']
-
     FSEL_NAMES = ['None', 'rfecv_linsvc', 'mrmr']
+    TO_RUN = None
+    TO_RUN_BY_LVL = {
+        '4lvl':{
+            ('None', 'regular'): ('GDBcls',),
+            ('None', 'svm'): ('BAGcls',),
+        },
+        '3lvl':{
+            ('mrmr', 'svm'): ('XGBcls',)
+        }
+    }
 
     MODEL_UP_FSEL_NAMES = [
         ('SVM', 'None', 'None'),
